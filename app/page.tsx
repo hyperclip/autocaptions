@@ -190,7 +190,7 @@ export default function Home() {
       <footer className="mt-16 pt-8 text-xs" style={{ color: "var(--muted)" }}>
         Powered by{" "}
         <a
-          href="https://hyperclip.io"
+          href="https://hyperclip.co"
           target="_blank"
           rel="noreferrer"
           className="underline-offset-4 hover:underline"
