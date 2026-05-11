@@ -27,7 +27,7 @@ export type CaptionStyleOverride = {
 };
 
 export const CAPTION_STYLE: CaptionStyleOverride = {
-  fontFamily: "Bebas Neue",
+  fontFamily: "Anton",
   fontSize: 80,
   textColor: "#FFFFFF",
   highlightColor: "#FFD700",
