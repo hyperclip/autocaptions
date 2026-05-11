@@ -1,8 +1,9 @@
-const REQUIRED = [
-  "HYPERCLIP_BASE_URL",
-  "HYPERCLIP_API_KEY",
-  "HYPERCLIP_FLOW_ID",
-] as const;
+// Production Hyperclip API base. Override with HYPERCLIP_BASE_URL only for
+// staging or self-hosted setups — most callers should leave it unset.
+const DEFAULT_BASE_URL =
+  "https://zjasnfhprfiftozodqsz.supabase.co/functions/v1/api-v1";
+
+const REQUIRED = ["HYPERCLIP_API_KEY", "HYPERCLIP_FLOW_ID"] as const;
 
 export type ServerEnv = {
   baseUrl: string;
@@ -28,7 +29,10 @@ export function serverEnv(): ServerEnv {
   }
 
   return {
-    baseUrl: process.env.HYPERCLIP_BASE_URL!.replace(/\/$/, ""),
+    baseUrl: (process.env.HYPERCLIP_BASE_URL ?? DEFAULT_BASE_URL).replace(
+      /\/$/,
+      "",
+    ),
     apiKey: process.env.HYPERCLIP_API_KEY!,
     flowId: process.env.HYPERCLIP_FLOW_ID!,
     videoStepIndex,
