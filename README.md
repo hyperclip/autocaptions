@@ -48,6 +48,7 @@ cp .env.example .env.local
 | `HYPERCLIP_API_KEY` | yes | Hyperclip app → **Settings → Developer → New key**. Looks like `hck_live_...`. |
 | `HYPERCLIP_FLOW_ID` | yes | The UUID of your saved autocaption flow. List them with `curl https://zjasnfhprfiftozodqsz.supabase.co/functions/v1/api-v1/flows -H "Authorization: Bearer $HYPERCLIP_API_KEY"`. |
 | `HYPERCLIP_VIDEO_STEP_INDEX` | no (default `0`) | Zero-based index of the `media_input` node in your flow. Inspect with `curl .../flows/$HYPERCLIP_FLOW_ID -H "Authorization: Bearer $HYPERCLIP_API_KEY"` and read `required_inputs`. |
+| `HYPERCLIP_CAPTION_STEP_INDEX` | no (default `1`) | Zero-based index of the `auto_captions` node in your flow. Used to send the picked caption style preset as `_caption_style`. |
 | `HYPERCLIP_BASE_URL` | no | Defaults to Hyperclip production (`https://zjasnfhprfiftozodqsz.supabase.co/functions/v1/api-v1`). Only set this for staging or self-hosted instances. |
 | `BLOB_READ_WRITE_TOKEN` | yes | On Vercel: enable Blob storage on the project and this is injected automatically. Locally: copy it from the Vercel dashboard. |
 

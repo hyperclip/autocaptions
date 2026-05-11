@@ -6,6 +6,8 @@ import { Dropzone } from "@/components/Dropzone";
 import { ProgressCard } from "@/components/ProgressCard";
 import { ResultCard } from "@/components/ResultCard";
 import { ErrorCard } from "@/components/ErrorCard";
+import { StylePicker } from "@/components/StylePicker";
+import { DEFAULT_STYLE_ID } from "@/lib/captionStyles";
 
 type State =
   | { kind: "idle" }
@@ -23,6 +25,7 @@ type State =
 
 export default function Home() {
   const [state, setState] = useState<State>({ kind: "idle" });
+  const [styleId, setStyleId] = useState<string>(DEFAULT_STYLE_ID);
   const cancelledRef = useRef(false);
 
   const reset = useCallback(() => {
@@ -63,7 +66,7 @@ export default function Home() {
       const res = await fetch("/api/captions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ blobUrl }),
+        body: JSON.stringify({ blobUrl, styleId }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error ?? "Failed to start captioning");
@@ -85,7 +88,7 @@ export default function Home() {
       status: "queued",
       currentStep: null,
     });
-  }, []);
+  }, [styleId]);
 
   useEffect(() => {
     if (state.kind !== "processing") return;
@@ -151,7 +154,12 @@ export default function Home() {
       </header>
 
       <section className="flex-1">
-        {state.kind === "idle" && <Dropzone onFile={start} />}
+        {state.kind === "idle" && (
+          <div className="flex flex-col gap-6">
+            <Dropzone onFile={start} />
+            <StylePicker value={styleId} onChange={setStyleId} />
+          </div>
+        )}
 
         {state.kind === "uploading" && (
           <ProgressCard

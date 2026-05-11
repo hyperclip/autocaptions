@@ -96,19 +96,29 @@ async function request<T>(
 export async function createRun(args: {
   videoUrl: string;
   idempotencyKey: string;
+  captionStyle?: Record<string, unknown> | null;
 }): Promise<{ id: string; status: RunStatus; created_at: string }> {
-  const { flowId, videoStepIndex } = serverEnv();
+  const { flowId, videoStepIndex, captionStepIndex } = serverEnv();
+
+  const inputs: {
+    media: Record<string, { url: string; type: "video" }>;
+    model_overrides?: Record<string, Record<string, unknown>>;
+  } = {
+    media: {
+      [String(videoStepIndex)]: { url: args.videoUrl, type: "video" },
+    },
+  };
+
+  if (args.captionStyle && Object.keys(args.captionStyle).length > 0) {
+    inputs.model_overrides = {
+      [String(captionStepIndex)]: { _caption_style: args.captionStyle },
+    };
+  }
+
   return request("/runs", {
     method: "POST",
     headers: { "Idempotency-Key": args.idempotencyKey },
-    body: JSON.stringify({
-      flow_id: flowId,
-      inputs: {
-        media: {
-          [String(videoStepIndex)]: { url: args.videoUrl, type: "video" },
-        },
-      },
-    }),
+    body: JSON.stringify({ flow_id: flowId, inputs }),
   });
 }
 

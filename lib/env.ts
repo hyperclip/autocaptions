@@ -10,21 +10,25 @@ export type ServerEnv = {
   apiKey: string;
   flowId: string;
   videoStepIndex: number;
+  captionStepIndex: number;
 };
+
+function parseStepIndex(name: string, value: string | undefined, fallback: number): number {
+  const raw = value ?? String(fallback);
+  const parsed = Number.parseInt(raw, 10);
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    throw new Error(
+      `${name} must be a non-negative integer (got "${raw}").`,
+    );
+  }
+  return parsed;
+}
 
 export function serverEnv(): ServerEnv {
   const missing = REQUIRED.filter((k) => !process.env[k]);
   if (missing.length > 0) {
     throw new Error(
       `Missing required env vars: ${missing.join(", ")}. See .env.example.`,
-    );
-  }
-
-  const rawIndex = process.env.HYPERCLIP_VIDEO_STEP_INDEX ?? "0";
-  const videoStepIndex = Number.parseInt(rawIndex, 10);
-  if (!Number.isFinite(videoStepIndex) || videoStepIndex < 0) {
-    throw new Error(
-      `HYPERCLIP_VIDEO_STEP_INDEX must be a non-negative integer (got "${rawIndex}").`,
     );
   }
 
@@ -35,6 +39,15 @@ export function serverEnv(): ServerEnv {
     ),
     apiKey: process.env.HYPERCLIP_API_KEY!,
     flowId: process.env.HYPERCLIP_FLOW_ID!,
-    videoStepIndex,
+    videoStepIndex: parseStepIndex(
+      "HYPERCLIP_VIDEO_STEP_INDEX",
+      process.env.HYPERCLIP_VIDEO_STEP_INDEX,
+      0,
+    ),
+    captionStepIndex: parseStepIndex(
+      "HYPERCLIP_CAPTION_STEP_INDEX",
+      process.env.HYPERCLIP_CAPTION_STEP_INDEX,
+      1,
+    ),
   };
 }
