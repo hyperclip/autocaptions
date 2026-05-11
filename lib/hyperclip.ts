@@ -35,7 +35,9 @@ async function request<T>(
   init: RequestInit & { body?: string } = {},
 ): Promise<T> {
   const { baseUrl, apiKey } = serverEnv();
-  const res = await fetch(`${baseUrl}${path}`, {
+  const url = `${baseUrl}${path}`;
+  const method = init.method ?? "GET";
+  const res = await fetch(url, {
     ...init,
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -51,6 +53,18 @@ async function request<T>(
     body = text ? JSON.parse(text) : null;
   } catch {
     body = text;
+  }
+
+  if (!res.ok) {
+    // Log raw request/response to Vercel function logs so 4xx/5xx
+    // responses can be inspected end-to-end (URL, method, status, body).
+    console.error("[hyperclip] non-2xx response", {
+      method,
+      url,
+      status: res.status,
+      contentType: res.headers.get("content-type"),
+      bodyPreview: typeof text === "string" ? text.slice(0, 1000) : null,
+    });
   }
 
   if (!res.ok) {
