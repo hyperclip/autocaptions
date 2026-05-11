@@ -54,12 +54,26 @@ async function request<T>(
   }
 
   if (!res.ok) {
-    const errBody = body as { error_code?: string; error_message?: string; message?: string } | null;
+    // Hyperclip's HTTP-level errors are shaped `{ error: { code, message } }`.
+    // Run-level errors on the run object use `error_code` / `error_message` at
+    // top level. Surface whichever is present so the UI shows a useful reason.
+    const errBody = body as
+      | {
+          error?: { code?: string; message?: string };
+          error_code?: string;
+          error_message?: string;
+          message?: string;
+          code?: string;
+        }
+      | null;
     const message =
+      errBody?.error?.message ??
       errBody?.error_message ??
       errBody?.message ??
-      (typeof body === "string" ? body : `Hyperclip request failed (${res.status})`);
-    throw new HyperclipError(message, res.status, errBody?.error_code);
+      (typeof body === "string" && body.length > 0 ? body : null) ??
+      `Hyperclip request failed (${res.status})`;
+    const code = errBody?.error?.code ?? errBody?.error_code ?? errBody?.code;
+    throw new HyperclipError(message, res.status, code);
   }
 
   return body as T;
