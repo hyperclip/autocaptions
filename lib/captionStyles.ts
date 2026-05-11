@@ -1,9 +1,12 @@
-// Caption style presets — sent to Hyperclip as
+// Caption style sent to Hyperclip on every run as
 // `inputs.model_overrides[<auto_captions step>]._caption_style`.
 //
-// Field shape is documented at:
+// Field shape documented at:
 //   https://docs.hyperclip.co/nodes/auto-captions  (style options)
 //   https://docs.hyperclip.co/api/inputs           (_caption_style override key)
+//
+// This is the viral-TikTok look: bold white text, gold per-word highlight,
+// thick black stroke, pop animation per word, lower-middle position.
 
 export type CaptionStyleOverride = {
   fontFamily?: string;
@@ -23,79 +26,17 @@ export type CaptionStyleOverride = {
   shadowBlur?: number;
 };
 
-export type CaptionStylePreset = {
-  id: string;
-  label: string;
-  description: string;
-  // `null` means "don't send an override" — use whatever the flow has baked in.
-  override: CaptionStyleOverride | null;
+export const CAPTION_STYLE: CaptionStyleOverride = {
+  fontFamily: "Inter",
+  fontSize: 72,
+  textColor: "#FFFFFF",
+  highlightColor: "#FFD700",
+  strokeColor: "#000000",
+  strokeWidth: 8,
+  animation: "pop",
+  animationScope: "word",
+  position: 72,
+  uppercase: true,
+  shadowColor: "#000000",
+  shadowBlur: 12,
 };
-
-export const CAPTION_STYLES: readonly CaptionStylePreset[] = [
-  {
-    id: "default",
-    label: "Default",
-    description: "Use the flow's baked-in style",
-    override: null,
-  },
-  {
-    id: "pop",
-    label: "Pop",
-    description: "Yellow word highlight · bounce per word",
-    override: {
-      fontFamily: "Inter",
-      fontSize: 64,
-      textColor: "#FFFFFF",
-      highlightColor: "#FACC15",
-      strokeColor: "#000000",
-      strokeWidth: 6,
-      animation: "pop",
-      animationScope: "word",
-      position: 70,
-      uppercase: true,
-    },
-  },
-  {
-    id: "bold",
-    label: "Bold",
-    description: "Thick outlined white · 3-word groups",
-    override: {
-      fontFamily: "Inter",
-      fontSize: 72,
-      textColor: "#FFFFFF",
-      strokeColor: "#000000",
-      strokeWidth: 8,
-      animation: "fade",
-      animationScope: "group",
-      wordGroupSize: 3,
-      position: 75,
-      uppercase: true,
-    },
-  },
-  {
-    id: "minimal",
-    label: "Minimal",
-    description: "Small lowercase · subtle fade",
-    override: {
-      fontFamily: "Inter",
-      fontSize: 36,
-      textColor: "#FFFFFF",
-      strokeColor: "#000000",
-      strokeWidth: 2,
-      animation: "fade",
-      animationScope: "group",
-      wordGroupSize: 5,
-      position: 88,
-      uppercase: false,
-    },
-  },
-] as const;
-
-export const DEFAULT_STYLE_ID = "default";
-
-export function getCaptionStyle(id: string): CaptionStylePreset {
-  return (
-    CAPTION_STYLES.find((s) => s.id === id) ??
-    CAPTION_STYLES.find((s) => s.id === DEFAULT_STYLE_ID)!
-  );
-}
